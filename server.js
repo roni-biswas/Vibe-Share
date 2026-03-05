@@ -2,6 +2,7 @@ require("dotenv").config();
 const connectToDatabase = require("./database/db");
 const express = require("express");
 const authRoutes = require("./routes/auth-routes");
+const postRoutes = require("./routes/post-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // routes
 app.use("/api/auth", authRoutes);
+app.use("/api/post", postRoutes);
 
 // listening server
 app.listen(PORT, () => {

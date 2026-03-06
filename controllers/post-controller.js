@@ -50,4 +50,37 @@ const createPost = async (req, res) => {
   }
 };
 
-module.exports = { createPost };
+const fetchPost = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 3;
+    const skip = (page - 1) * limit;
+
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder == "asc" ? 1 : -1;
+    const totalPosts = await Post.countDocuments();
+    const totalPage = Math.ceil(totalPosts / limit);
+
+    const sortObj = {};
+    sortObj[sortBy] = sortOrder;
+
+    const posts = await Post.find().sort(sortObj).skip(skip).limit(limit);
+
+    if (posts.length > 0) {
+      return res.status(200).json({
+        success: true,
+        totalPosts: totalPosts,
+        totalPages: totalPage,
+        data: posts,
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Some error occurred!",
+      error: err.message,
+    });
+  }
+};
+
+module.exports = { createPost, fetchPost };

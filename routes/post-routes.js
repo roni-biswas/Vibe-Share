@@ -1,5 +1,5 @@
 const express = require("express");
-const { createPost } = require("../controllers/post-controller");
+const { createPost, fetchPost } = require("../controllers/post-controller");
 const uploadMiddleware = require("../middleware/upload-middleware");
 const authMiddleware = require("../middleware/auth-middleware");
 
@@ -12,5 +12,8 @@ router.post(
   uploadMiddleware.single("image"),
   createPost,
 );
+
+// get all post data
+router.get("/get", authMiddleware, fetchPost);
 
 module.exports = router;

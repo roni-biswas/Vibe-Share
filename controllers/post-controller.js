@@ -1,6 +1,7 @@
 const uploadToCloudinary = require("../helpers/cloudinary-helper");
 const Post = require("../models/Post");
 const fs = require("fs");
+const { cloudinary } = require("../config/cloudinary");
 
 const createPost = async (req, res) => {
   try {
@@ -83,4 +84,49 @@ const fetchPost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, fetchPost };
+// post delete controller
+const deletePost = async (req, res) => {
+  try {
+    // get current post id of post to be deleted
+    const postId = req.params.id;
+
+    // get user id (current Logged in)
+    const userId = req.userInfo.userId;
+
+    // get post by post id
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found!",
+      });
+    }
+
+    // check if this post is created by the current user who is try to delete this
+    if (post.author.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Your are not authorized to delete this post.",
+      });
+    }
+
+    // delete image from cloudinary
+    await cloudinary.uploader.destroy(post.image.public_id);
+
+    // delete post from database
+    await Post.findByIdAndDelete(postId);
+
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully!",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Some error occurred!",
+      error: err.message,
+    });
+  }
+};
+
+module.exports = { createPost, fetchPost, deletePost };

@@ -1,5 +1,9 @@
 const express = require("express");
-const { createPost, fetchPost } = require("../controllers/post-controller");
+const {
+  createPost,
+  fetchPost,
+  deletePost,
+} = require("../controllers/post-controller");
 const uploadMiddleware = require("../middleware/upload-middleware");
 const authMiddleware = require("../middleware/auth-middleware");
 
@@ -15,5 +19,7 @@ router.post(
 
 // get all post data
 router.get("/get", authMiddleware, fetchPost);
+// delete post from database
+router.delete("/delete/:id", authMiddleware, deletePost);
 
 module.exports = router;

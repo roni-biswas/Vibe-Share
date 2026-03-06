@@ -25,7 +25,7 @@ const createPost = async (req, res) => {
         url: result.url,
         public_id: result.public_id,
       },
-      // author:
+      author: req.userInfo.userId,
     });
     await newPost.save();
 

@@ -3,6 +3,7 @@ const connectToDatabase = require("./database/db");
 const express = require("express");
 const authRoutes = require("./routes/auth-routes");
 const postRoutes = require("./routes/post-routes");
+const homeRoutes = require("./routes/home-routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,6 +17,7 @@ app.use(express.json());
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
+app.use("/api/home", homeRoutes);
 
 // listening server
 app.listen(PORT, () => {

@@ -58,23 +58,57 @@ const fetchPost = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const sortBy = req.query.sortBy || "createdAt";
-    const sortOrder = req.query.sortOrder == "asc" ? 1 : -1;
-    const totalPosts = await Post.countDocuments();
-    const totalPage = Math.ceil(totalPosts / limit);
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
 
-    const sortObj = {};
-    sortObj[sortBy] = sortOrder;
+    // Aggregation Pipeline
+    const result = await Post.aggregate([
+      {
+        $facet: {
+          // Get the actual data
+          metadata: [{ $count: "totalPosts" }],
+          // Get the paginated results
+          posts: [
+            { $sort: { [sortBy]: sortOrder } },
+            { $skip: skip },
+            { $limit: limit },
+            // Join with User to show who posted
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "authorDetails",
+              },
+            },
+            { $unwind: "$authorDetails" },
+            {
+              // Selection of specific fields
+              $project: {
+                title: 1,
+                description: 1,
+                image: 1,
+                category: 1,
+                createdAt: 1,
+                "authorDetails.username": 1,
+                "authorDetails.email": 1,
+                "authorDetails.role": 1,
+              },
+            },
+          ],
+        },
+      },
+    ]);
 
-    const posts = await Post.find().sort(sortObj).skip(skip).limit(limit);
+    const totalPosts = result[0].metadata[0]?.totalPosts || 0;
+    const posts = result[0].posts;
 
-    if (posts.length > 0) {
-      return res.status(200).json({
-        success: true,
-        totalPosts: totalPosts,
-        totalPages: totalPage,
-        data: posts,
-      });
-    }
+    res.status(200).json({
+      success: true,
+      totalPosts,
+      totalPages: Math.ceil(totalPosts / limit),
+      currentPage: page,
+      data: posts,
+    });
   } catch (err) {
     res.status(500).json({
       success: false,

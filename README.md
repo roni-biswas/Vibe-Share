@@ -34,7 +34,7 @@ A robust **Node.js** and **Express** backend for a social media or portfolio pla
 
 ## 📂 Folder Structure
 
-````text
+```text
 ├── config/             # Database & Cloudinary configurations
 ├── controllers/        # Logic for Auth and Posts
 ├── middleware/         # Auth guard & Multer setup
@@ -43,10 +43,12 @@ A robust **Node.js** and **Express** backend for a social media or portfolio pla
 ├── helpers/              # Helper functions & Cloudinary upload utility
 ├── .env                # Environment variables (private)
 └── server.js           # Entry point
-
+```
 
 **Clone the repository:**
-   ```bash
-   git clone https://github.com/roni-biswas/Vibe-Share.git
-   cd Vibe-Share
-````
+
+```bash
+git clone https://github.com/roni-biswas/Vibe-Share.git
+cd Vibe-Share
+
+```
